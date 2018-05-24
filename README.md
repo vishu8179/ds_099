@@ -1,1 +1,2 @@
-# ds_099
+# tera99
+teradata
