@@ -1,0 +1,244 @@
+ls
+cat
+rev
+paste // for merging files
+cp
+mv
+cut
+wc
+sort
+uniq
+tr
+head
+tail
+umask
+chmod
+find
+touch
+sed
+awk
+grep
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ls command examples
+
+ls // list the commands
+ls -l // list it with long information like file size(in bytes), owner and date of creation
+ls -lh // it shows the file size in MB instead of bytes so that we can easily read the size info
+ls -a //show hidden files
+ls -lt  // here the t option is for showing the lastest modified file on top
+ls -ltr  // here "r" option added to show the above command in reverse order
+ls -ld // it shows the directory information // 
+
+refer http://www.thegeekstuff.com/2009/07/linux-ls-command-examples for more info
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Cat command examples
+
+cat file.txt //display file contents
+cat file1.txt file2.txt  // displays both file contents
+cat > file.txt creates a file
+cat file.txt >> file2.txt  // appends file.txt contents to file2.txt
+cat file1.txt file2.txt >> file3.txt // appends two file contents into 3rd file
+cat -n file1.txt // displays the file contents with line numbers (includes empty line)
+cat -b file1.txt // displays file contents with number (excludes empty lines and gives numbering only to non-empty lines)
+cat <<EOF // it reads lines from standard input and prints until standard input has a line EOF
+tac file1.txt // displays file1 contents in reverse order (note: if file has 1 to 5 lines then this command will show line5 on top and line1 at bottom)
+ tac is similar to rev command
+the only difference between tac and rev is that rev is applied to characters where as tac is applied to lines
+which means that rev file1.txt will display line 1 on top and line5 at bottom but their characters will be reversed in each line
+
+refer http://www.thegeekstuff.com/2013/04/cat-command-examples/  for more info
+
+
+cat file1.txt >> file2.txt // it joins or appends two files horizontally that means it is like funneling the data in datastage. columsn must be same
+
+but what if we want two files having different columns wants to be joined? that is vertical joining
+
+example file1 has
+colA colB colC
+
+file2 has
+
+colD colE colF
+
+now if we want to join both the files we have PASTE command
+
+paste file1.txt file2.txt  // this command will give the below result
+
+colA colB colC colD colE colF
+
+Paste command is used when there is no common column. If you want to join files using a common field then we have to use JOIN command
+
+
+example file1 has
+colA colB colC
+
+file2 has
+
+colD colE colA
+
+In above two files colA is the common column.
+
+join -t ':' -1 N -2 N file1.txt file2.txt
+
+
+Here -t is the field seperator. 
+-1 N is the nth field in first files
+-2 N is the nth field in second file
+
+Examples:
+join -t ' ' -1 1 -2 3 file1.txt file2.txt
+
+colA colB colC colD colE
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Cut command examples
+
+file.txt
+--------
+Iam Dinesh
+Working at XEROX
+Ihave 5 years of exp
+
+cut -c2 file.txt // will dispplay the 2nd character in each line
+o/p: a
+       o
+       h
+
+cut -c3-5 // will display chracters from 3 to 5 position in each line
+cut -c-6   // will display characters from beginning to 6th position character in each line
+cut -c4- // will display 4th position character to end of the line in each line
+
+cut -d ':' -f1 file.txt   //will display first field/column. here "d" is used to specify delimiter
+cut -d',' -f1-4  // will display first column to 4 th column
+cut -d ',' -f3-6,8,9 will display 3 to 6 columns and 8th and 9th columns 
+
+cut -d ',' -s -f3 file.txt   // will display only those lines which has delimiter "comma" else it will not display lines. If we dont specify "s" option it will display entire lines if it doesn't find delimiter "comma"
+
+cut -d ',' --complement -s -f3  // just opposite to above command. It will display only those line which doesn;t have "comma" delimiter 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PS command examples
+
+To list down all currently running processes
+
+ps -ef
+
+ Refer http://www.thegeekstuff.com/2011/04/ps-command-examples/ for more info
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+TO find out how much free memory available on the disk
+
+df command in Linux provides disk space usage information of your file systems
+
+
+Print Human Readable Sizes
+
+We are used to reading the memory in terms of gigabytes, megabytes, etc as its easy to read and remember. df command also provides an option ‘-h’ to print the memory statistics in human readable format.
+
+Option -h stands for “human” readable format. As shown in the output below, G is used for gigabytes and M is used for megabytes.
+
+$ df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda1             127G  6.0G  114G   5% /
+tmpfs                 3.9G     0  3.9G   0% /dev/shm
+
+
+Refer http://www.thegeekstuff.com/2012/05/df-examples/ for more info 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Sort command examples
+
+sort file.txt  // sorts in ascending order by default
+sort -r file.txt  // descesing or reverse order
+sort -n file.txt   // sorts in numeric order
+sort -M file  // sorts based on month
+sort -k3 file.txt // sorts by 3rd word in each line
+sort -t '|' -k4 file.txt   // sorts by 4th field in file
+sort -u  // will give only unique line. This is one way of eliminating the duplicate lines in file
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+uniq command examples
+uniq file.txt  // displays only unique lines
+uniq -d  // displays the duplicate lines( once) in a file
+uniq -D //displays the duplicate lines as many time as the occurenes in the file
+uniq -c file  // counts the number of occurences of a each line
+uniq -u //displays those line which occured only once in the file
+uniq -c -w 8 // compares only first 8 characters of each line and there by determines if they are duplicates or not
+uniq -D -w 6 //displays all such duplicate by comparing only first 6 characters 
+uniq -D -s 2   // skips comparing first two characters in comparision
+uniq -D -f2 // skips first two fields in comparison  
+
+http://www.thegeekstuff.com/2013/05/uniq-command-examples  // for reference
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+tr command examples
+
+tr a-z A-Z file.txt   //lower case to upper case
+tr -d 't' file.txt  // removes t character from file
+tr -d [:digit:] removes all digits from file
+tr -cd [:digit:]  complement to above command. removes all except digits
+tr [:space:] '\t'    \\  converts space to tab
+
+http://www.thegeekstuff.com/2012/12/linux-tr-command/   // reference
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+head command examples
+
+head -n 3 file // last 3 lines
+head -c 3 file // last 3 bytes
+head -n -3 file // prints all but not lst 3 lines
+
+http://linux.101hacks.com/unix/head/   // reference
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+tail command examples
+
+tail -n4 file // last 4 lines
+tail -c4 file // last 4 bytes
+tail -n+4 //prints from 4th line to end of file
+tail -c+4 // prints form 4th byte to end of file
+tail -f file.txt   // prints last 10 lines and will wait until new lines gets appended to the file and prints the new lines
+
+http://www.folkstalk.com/2012/10/tail-command-examples-in-unix-linux.html  
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+awk command examples
+
+awk -F, '{print $1,$2}' file   // prints col 1 and 2
+awk -F, 
+
+Look at examples in below link
+
+http://www.thegeekstuff.com/2010/01/awk-introduction-tutorial-7-awk-print-examples
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,577 @@
+AWK, GRP, SED tutorial
+
+
+
+
+This tutorial covers only the basics of AWK, GRP, SED tools 
+and regular expressions commonly used in Unix shell scripting.  
+
+
+Introduction to AWK
+------------------------------
+
+An awk program is a sequence of patterns and actions that tell what 
+to look for in the input data and what to do when it is found.  
+
+Display user names from /etc/passwd (field 1): 
+
+awk -F: '{ print $1 }' /etc/passwd
+Where F is the field separator; in passwd file, fields are separated by ':' 
+Default field separator is a blank space. Awk scans the input file and
+splits each input line into fields.  
+
+Similarly:
+cat /etc/passwd | awk -F: '{ print $1 }'
+
+Display user names home directories and login shell (fields 1 and 7):
+and store them in a separate file, users.txt
+
+awk -F: '{ print $1, $6, $7 }' /etc/passwd > users.txt
+or
+cat /etc/passwd | awk -F: '{ print $1, $6, $7 }' > users.txt
+
+Default field separator is empty space. To print users (field 1) from just 
+created file users.txt:
+
+awk '{ print $1 }' users.txt
+
+
+More Example on AWK:
+
+1) print all columns:    
+
+awk -F, '{print $0}' SampleFile.csv //here comma is field seperator
+
+2) print the number of fields in a line :  
+
+awk -F, '{print NF}' SampleFile.csv //displays no of fields in each line
+
+3) print the count of records of a file
+
+awk -F, '{print NR}' SampleFile.csv // displays all records in a sequence
+
+4) print total count of records of a file
+
+awk -F, 'END {print NR}' SampleFile.csv // displays total no of records 
+
+5) print a particular line in a file
+
+Example: to print line no 4 i.e. to extract a record
+
+awk -F, 'BEGIN {no=5} {if (NR==no) print $0}' SampleFile.csv //here if line no 4 is required then 5 should be given as 
+first line is considered as the column names in the file
+
+6) print output with field seperators
+
+awk -F, '{OFS=":"} {print $2,$4}' SampleFile.csv // OFS-output field seperator
+
+awk -F, 'BEGIN {NO=5} {IF (no==5) Print $0}'	
+
+7) Rank function implementation in UNIX
+
+awk -F, '{if ($3>x) {x=$3;i++};print $0 "|" i}'
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Introduction to GREP
+
+grep is used to search files or standard input for lines containing
+required patterns.
+We'll work with a text file, list.txt, containing the following text:
+
+
+Check the inode list today
+reboot the machine tomorrow
+  Reboot it again in a week 
+Call Tech support in case of emergency.
+tel: 834 
+
+Oop 0
+Oops 1
+Oopss 12
+Oopsss 123
+Oopssss  1234
+End
+
+ 
+
+To get the line containing string "inode" in file list.txt:
+
+grep inode  list.txt
+
+
+
+
+To search for the line containing "inode list" in all the files in current directory:
+
+grep "inode list" *
+
+
+
+grep -l "nav" /home/nofz/*  -- This command will list all files which has word "nav" in it.
+
+
+
+
+Syntax of grep:  grep [options] regex [files]
+where regex are regular expressions.
+
+
+
+Using regular expressions
+
+
+
+Regular expressions: Literals (plain text or literal text),
+ metacharacters (special meaning characters).
+
+When you construct regular expressions, you use metacharacters and literals
+to specify three basic ideas about your input text:
+position anchors, groups, ranges and quantity modifiers.
+
+Anchors: ^  -match at the beginning of a line
+         $  -match at the end of a line
+ 
+grep '^Call' list.txt 
+grep '^  Reboot' list.txt
+grep 'today$' list.txt
+
+Count the number of empty lines:
+grep -c '^$' list.txt
+
+Display all lines containing only the word End by itself:
+grep '^End$' list.txt
+
+Groups and ranges: [abc]   -match any single character from a,b or c 
+                   [a-e]   -match any single charcter from among the range a-e  
+                   [^abc]  -inverse match, matches a single character not
+                            among a,b, or c.
+                   [^a-e]  -inverse match, matches a single character not from 
+                            the range a-e
+              \< word\>    -match word
+            . (single dot) -match any single character among a new line
+                  \        -turn off the special meaning of the character 
+                            that follows
+ 
+
+
+
+grep '[Rr]eboot' list.txt
+grep '\<[Rr]eboot\>' list.txt
+
+
+
+Display all lines from file list.txt which contain thre adjucent digits:
+grep '[0-9][0-9][0-9]' list.txt
+
+
+
+Display the lines with four or more characters in the line:
+grep '....' list.txt
+
+
+
+Display all non-blank lines from file list.txt:
+grep '.' list.txt
+
+
+
+Display all lines that contain a period:
+grep '\.' list.txt
+
+
+
+Modifiers:  *  -match zero or more instance of the preceding single character 
+            ?  -match zero or one  instance of the preceding regex
+                (implies 'grep -E' option).  
+            +  -match one or more  instance of the preceding regex
+                (implies 'grep -E' option).
+       \{n,m\} -match a range of occurrences of the single character or regex
+                 that precedes this construct; \{n\} matches n occurences;
+                 \{n,\} matches at least n occurences.      
+            |  -match either the regex specified before or after the
+                vertical bar (implies 'grep -E' option).
+ 
+
+
+Display all lines from list.txt that contain Oop, Oops, Oopss, and so on:
+grep 'Oops*' list.txt
+
+
+Q)Display all lines which do not match "naveen" pattern in the file
+
+A)grep -v 'naveen' sample.csv \\ "-v" option is called verbose. In other words negation 
+
+
+Q)Display all lines from list.txt that contain Oops, Oopss, and so on:
+A)grep 'Oopss*' list.txt
+
+
+
+Display all lines from list.txt that contain two or more adjacent digits:
+grep '[0-9][0-9][0-9]*' list.txt
+
+
+
+Display all lines from list.txt that contain '3' or '34' number combination:
+grep -E '34?' list.txt
+
+
+
+Display all lines from list.txt containing at least one digit:
+grep -E '[0-9]+' list.txt 
+
+
+
+Display all lines from list.txt containing sss and ssss:
+grep 's\{3,4\}' list.txt
+
+
+
+Display all lines from list.txt containing any three, four or five digit
+numbers:
+grep '\<[0-9]\{3,5\}\>' list.txt
+
+
+
+Display all lines from list.txt containing "Reboot", "reboot" or "support"
+strings:
+grep -E '[Rr]eboot|support' list.txt
+
+
+
+Display all lines from list.txt containing any letter (no empty lines):
+grep '[A-Za-z]' list.txt
+
+
+
+Display all lines from list.txt containing any non alpha-numeric and space symbol:
+grep '[^ 0-9A-Za-z]' list.txt
+
+
+
+Display all lines from list.txt containing uppercase letter, followed by zero
+or more lowercase letters:
+grep '[A-Z][a-z]' list.txt
+
+
+
+Display all lines from list.txt containing 3 digit telephone number:
+grep 'tel: [0-9]\{3\}' list.txt
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Introduction to SED
+-------------------------------------
+
+String editor, sed, is used for editing lines in a file or a stream; output is going
+to the standard output and can be re-directed to a new file.
+
+
+
+Syntax: sed [options] 'command1' [files]
+        sed [options] -e 'command1' [-e command2 ...] [files]
+        sed [options] -f script [files] 
+
+
+
+Delete lines from 3 through 5 in file list.txt:
+sed '3,5d' list.txt
+
+
+
+Delete lines that contain "O" at the beginning of the line:
+sed '/^O/d' list.txt
+
+
+
+Translate capital C,R,O into small c,r,o:
+sed 'y/CRO/cro/' list.txt 
+
+
+
+Delete ampty lines:
+sed '/^$/d' list.txt
+
+
+
+delete last 5 line "from file permanently" having 100 lines
+
+sed -i '96,100 d' file.txt
+
+
+
+If row count is not known
+------------------------------
+tt=`wc -l file.txt| cut -f1 -d ' ' ` | sed -i "`expr $tt -4`, $tt d" test
+
+
+Replace string Oop with Wee for the first occurence on a line 
+sed 's/Oop/Wee/' lsst.txt 
+
+
+
+Remove ss string (replace with empty entry)for the first occurence on a line:
+sed 's/ss//' list.txt
+
+
+
+Remove ss string for all occurences on a line:
+sed 's/ss//g' list.txt
+
+
+
+Substitute a single space for any number of spaces wherever they occur on the
+line:
+sed 's/ */ /g' list.txt
+
+
+Substitute underscore for any number of spaces wherever they occur on the
+line:
+sed 's/ */_/g' list.txt
+
+print 4th line
+---------------
+sed -<n> ' 4 p' or sed -n ' 4 p'
+
+Or
+
+sed -n '4 p'
+
+to delete a line
+------------------
+
+sed '4 d' sample.csv
+
+to delete permanently from file
+-------------------------------
+
+sed -i '4 d' sample.csv
+
+
+replace a nth line with a new line
+-----------------------------------
+
+sed -i ' 10 d' file.txt
+sed -i '10 i this is a new line' file.txt
+
+
+
+
+
+reverse a string
+----------------
+
+echo "unix" | rev
+
+
+
+print non printable characters
+
+vi...command mode ( shift colon) ....type [set list]
+
+displays non printable characters like cntrl M
+
+zip a file
+
+gzip file.txt
+
+unzip 
+
+unzip -j file.txt
+
+file file.txt
+
+list all processes
+
+ps -ef
+
+kill process
+kill pid
+
+print hidden files
+ls -a
+
+length of a file
+echo -n "naveen" | wc -c //count chanracters that means length
+
+wc -l File1.txt //count lines
+wc -w File1.txt//count words
+
+list processes running in background
+ps -eaf
+
+
+
+Datastage commands in UNIX
+---------------------------	
+
+
+The below information is obtained from the below link
+
+http://www.dstagebox.com/2011/05/the-datastage-commands-in-unix/
+
+
+
+
+IN UNIX, the Datastage home directory location will always be specified in the “.dshome” file which will be present 
+in the root directory.  
+Before you can run your Datastage commands you will have to run the following commands
+
+¦cd  `cat /.dshome`
+
+
+This will change the location to the home directory. By default this will be /opt/IBM/InformationServer/Server/DSEngine
+
+
+
+
+
+¦. ./dsenv > /dev/null 2>&1
+This will run the dsenv file which contains all the environment variables. Without doing this, your UNIX commands won’t run on the command prompt.
+
+
+After you have done this then you can use any Datastage command for interacting with the server. 
+The main command you can use is the ‘dsjob’ command which is not used only to run jobs but for a wide variety of reasons. 
+Let’s look at the various ways you can use the dsjob command
+
+
+
+To run a job
+--------------
+
+Using the dsjob command you can start,stop,reset or run the job in  validation mode.
+
+dsjob  –run –mode VALIDATE  project_name  job_name
+
+This command will actually run the job in validation mode. 
+Similarly you can use RESET or RESTART instead of VALIDATE depending on what type of run you want. 
+If you want a normal run then you will not need to specify the –mode keyword as shown below
+
+
+dsjob –run project_name  job_name | job_name.invocationid
+
+Running with the invocationid would mean that the job would be run with that specific invocation id
+
+
+
+To stop a job
+---------------
+
+Stopping a job is fairly simple. You might not actually require it but still its worth to take a look. 
+It acts the same way as you would stop a running job the Datastage director.
+
+dsjob –stop  project_name  job_name|job_name.invocationid
+
+
+
+
+To list projects, jobs, stages in jobs, links in jobs, parameters in jobs and invocations of jobs
+----------------------------------------------------------------------------------------------
+
+dsjob can very easily give you all the above based on the different keywords. 
+It will be useful for you if you want to get a report of what’s being used in what project and things like that
+
+The various commands are shown below
+
+‘dsjob –lprojects’  will give you a list of all the projects on the server
+
+‘dsjob –ljobs  project_name’ will give you a list of jobs in a particular project
+
+‘dsjobs –lstages  project_name job_name’  will give you a list of all the stages used in your job. 
+Replacing –lstage with –llinks will give you a list of all the links in your job. 
+Using –lparams will give you a list of all the parameters used in your job. 
+Using –linvocations will give you a list of all the invocations of your multiple instance job.
+
+
+
+
+
+To generate reports of a job
+--------------------------------
+
+You can get the basic information of a job buy using the  ‘jobinfo’ option as shown below
+
+dsjob -jobinfo  project_name job_name
+
+Running this command will give you a short report of your job which includes 
+The current status of the job, the name of any controlling job for the job, 
+the date and time when the job started , the wave number of the last or current run (internal InfoSphere Datastage reference number) and the user status
+
+
+
+
+
+You can get a more detailed report using the below command
+-------------------------------------------------------------
+
+dsjob -report  project  job_name BASIC|DETAIL|XML
+
+BASIC means that your report will contain very basic information like start/end time of the job , 
+time elapsed and the current status of the job. DETAIL as the name indicates will give you a very detailed report on the 
+job down to the stages and link level. XML would give you an XML report which is also a detailed report in an XML format.
+
+
+
+To access logs
+---------------
+
+You can use the below command to get the list of latest 5 fatal errors  from the log of the job that was just run
+
+dsjob -logsum –type FATAL –max 5 project_name job_name
+
+You can get different types of information based on the keyword you specify for –type. 
+Full list of allowable types are available in the help guide for reference.
+
+There are a number of other options also available to get different log information.
+ You can explore this in more detail in the developer guide. With the Datastage commands you 
+can administer jobs, run jobs, maintain jobs, handle errors, prepare meaningful job logs and even prepare reports.  
+The possibilities are endless. If you like to code then you won’t mind spending your time exploring the command line options available.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
